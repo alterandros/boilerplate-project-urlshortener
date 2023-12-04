@@ -3,6 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
+// Require short unique id generator
+const ShortUniqueId = require('short-unique-id');
+// Instantiate
+const uid = new ShortUniqueId({ length: 5 });
+
 // Create a body-parser object function
 const bodyParser = require('body-parser');
 // Use body-parser to Parse POST Requests
