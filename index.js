@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 
 // Create a body-parser object function
-let bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 // Use body-parser to Parse POST Requests
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -26,10 +26,8 @@ const urlSchema = new mongoose.Schema({
     }
 });
 
-let url;
-
 // Create model and assign it to url variable
-url = mongoose.model('url', urlSchema);
+const Url = mongoose.model('url', urlSchema);
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -47,7 +45,10 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
-
+// Get Data from POST Requests using bodyparser
+app.post("/api/shorturl", function(req, res) {
+  res.json({ url: req.body.url });
+});
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
