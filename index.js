@@ -62,7 +62,7 @@ function isValidURL(url) {
   }
 };
 
-// Get Data from POST Requests using bodyparser
+// Get Data from POST Requests
 app.post('/api/shorturl', (req, res) => {
   // Get only hostname to check with dns
   const originalURL = req.body.url;
@@ -84,6 +84,13 @@ app.post('/api/shorturl', (req, res) => {
   } else {
     res.json({ error:	"Invalid URL" });
   };
+});
+
+// Redirect user if short url is used
+app.get('/api/shorturl/:shortUrl', async (req, res) => {
+  const short_url = await Url.findOne({ shortUrl: req.params.shortUrl });
+  if (short_url == null) res.sendStatus(404);
+  res.redirect(short_url.url);
 });
 
 app.listen(port, function() {
