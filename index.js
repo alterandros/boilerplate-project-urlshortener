@@ -8,10 +8,12 @@ const ShortUniqueId = require('short-unique-id');
 // Instantiate
 const uid = new ShortUniqueId({ length: 5 });
 
-// Create a body-parser object function
-const bodyParser = require('body-parser');
-// Use body-parser to Parse POST Requests
-app.use(bodyParser.urlencoded({extended: false}));
+// import dns and url module to check url validity
+const dns = require("dns");
+const URL = require('url').URL;
+
+// Middleware to encode the post request
+app.use(express.urlencoded({extended: false}));
 
 // Add mongoose
 const mongoose = require('mongoose');
@@ -50,9 +52,38 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+// Function to check if url is valid format
+function isValidURL(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 // Get Data from POST Requests using bodyparser
-app.post("/api/shorturl", function(req, res) {
-  res.json({ url: req.body.url });
+app.post('/api/shorturl', (req, res) => {
+  // Get only hostname to check with dns
+  const originalURL = req.body.url;
+  // Check is url is valid
+  if (isValidURL(originalURL)) {
+    const urlObject = new URL(originalURL);
+    dns.lookup(urlObject.hostname, (err, address, family) => {
+      // If url is invalid then...
+      if (err) {
+        res.json({ error:	"Invalid URL" });
+      } else {
+        // If url is valid then...
+        Url.create({ url: originalURL, shortUrl: uid.rnd() }, function(err, data) {
+        if (err) return console.log(err);
+        res.json({original_url: data.url, short_url: data.shortUrl});
+        });
+      };
+    });
+  } else {
+    res.json({ error:	"Invalid URL" });
+  };
 });
 
 app.listen(port, function() {
